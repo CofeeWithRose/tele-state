@@ -2,7 +2,7 @@ import { SetStateAction, Key, Dispatch } from "react"
 
 export type UpdatePlugin<S> = (newState: S, preState: S) => void
 
-export interface SharedStateInterface<S, A> {
+export interface TeleStateInterface<S, A> {
   value: S
   dispatch: Dispatch<A>
   readonly setStateMap: { [id: number]: Dispatch<SetStateAction<S>> }
@@ -10,7 +10,7 @@ export interface SharedStateInterface<S, A> {
   apply: (plugin: UpdatePlugin<S>) => void
 }
 
-export class SharedState<S, A> implements SharedStateInterface<S, A> {
+export class TeleState<S, A> implements TeleStateInterface<S, A> {
   
   constructor(
      public value: S,
@@ -21,19 +21,19 @@ export class SharedState<S, A> implements SharedStateInterface<S, A> {
 
   public updatePlugins: UpdatePlugin<S>[] = []
 
-  dispatch(action: A ){
+  dispatch = (action: A ) => {
     const preValue = this.value
     this.value = this.reducer(this.value, action)
     this.handleUpdate(preValue, this.value)
   }
 
-  setState(value: S){
+  setState = (value: S) => {
     const preValue = this.value
     this.value = value
     this.handleUpdate(preValue, this.value)
   }
 
-  apply(plugin: UpdatePlugin<S>){
+  apply = (plugin: UpdatePlugin<S>) =>{
     this.updatePlugins.push(plugin)
   }
 
