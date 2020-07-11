@@ -1,6 +1,6 @@
 {
   "name": "tele-state",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "shared state with react hooks",
   "main": "lib/index.js",
   "scripts": {
@@ -16,5 +16,24 @@
   },
   "peerDependencies": {
     "react": "^16.8.0"
-  }
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CofeeWithRose/shared-state.git"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "store",
+    "state",
+    "share"
+  ],
+  "bugs": {
+    "url": "https://github.com/CofeeWithRose/shared-state/issues"
+  },
+  "homepage": "https://github.com/CofeeWithRose/shared-state#readme"
 }
