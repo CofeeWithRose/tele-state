@@ -52,7 +52,7 @@ function ComponentB(){
 
 ### useTeleReducer
 ```
-import { createTeleReducer } from './index'
+import { createTeleReducer } from 'tele-state'
 import React, { useEffect, Reducer } from 'react'
 
 
