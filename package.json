@@ -1,6 +1,6 @@
 {
   "name": "tele-state",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "description": "shared state with react hooks",
   "main": "lib/index.js",
   "scripts": {
@@ -25,6 +25,7 @@
     "type": "git",
     "url": "git+https://github.com/CofeeWithRose/shared-state.git"
   },
+  "files":["lib"],
   "keywords": [
     "react",
     "hooks",
