@@ -5,11 +5,46 @@ The best way to manage your state with hooks for your react application.
 efficiency 、light 、easy to use 、typescript friendly.  try it!
 
 
-## Demos
 
 ```
 npm i tele-state
 ```
+### step1 - create a useTeleState hook with init value.
+
+
+```
+import React, { useEffect } from 'react'
+
+import { createTeleState } from 'tele-state'
+
+
+const { useTeleState } = createTeleState(1)
+
+```
+
+### step2 - use it as hooks in any component.
+
+```
+
+  function ComponentA(){
+    const [ count ] = useTeleState()
+    console.log('B----------', count)
+    return <>{count}</>
+  }
+
+  function ComponentB(){
+    const [ count, setCount ] = useTeleState()
+    console.log('A----------', count)
+    useEffect( () =>{
+      setCount(count+1) // ComponentA will update too.
+    }, [] )
+    return <button onClick={() => setCount(count+1)}>add {count}</button>
+  }
+
+```
+
+## Demos
+
 ### useTeleState
 ```
 import { createTeleState } from 'tele-state'
