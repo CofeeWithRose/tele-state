@@ -1,37 +1,24 @@
 ## tele-state 
 
-All the components used the same 'teleHooks' will update while state change.
+The best way to manage your state with hooks for your react application.
 
-#### efficiency
-
-withought provider.
-
-withought re-render.
-
-#### light
-
-jsut one hundred lines ~.~ .
-
-#### easy to use
-
-the api is similar to  useState.
-
-#### typescript friendly
-
-try it
+efficiency 、light 、easy to use 、typescript friendly.  try it!
 
 
 ## Demos
 
+```
+npm i tele-state
+```
 ### useTeleState
 ```
 import { createTeleState } from 'tele-state'
 import React, { useEffect } from 'react'
 
 
-const initValue = 1
+
 // create a useTeleState hook, then you can use it as useState.
-const { useTeleState } = createTeleState<number>(initValue)
+const { useTeleState } = createTeleState(1)
 
 function ComponentA(){
 	const [ count ] = useTeleState()
