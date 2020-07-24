@@ -26,7 +26,9 @@
     "type": "git",
     "url": "git+https://github.com/CofeeWithRose/shared-state.git"
   },
-  "files":["lib"],
+  "files": [
+    "lib"
+  ],
   "keywords": [
     "react",
     "hooks",

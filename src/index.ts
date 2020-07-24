@@ -14,7 +14,6 @@ const useTele = <R extends Reducer<any, any>>(
   return result
 }
 
-<<<<<<< HEAD
 
 
 export const createTeleReducers = <R extends Reducer<any,any>>(reducers: R, initState: ReducerState<R> ) =>{
@@ -29,8 +28,6 @@ export const createTeleReducers = <R extends Reducer<any,any>>(reducers: R, init
   >>(reducer, initState)
 }
 
-=======
->>>>>>> d1a83016f3e870f8af846afd0d4414997ea97e30
 const createTeleReducer = <R extends Reducer<any, any>>(
   reducer: R,
   initState: ReducerState<R>, 
