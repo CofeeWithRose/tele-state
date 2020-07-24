@@ -1,5 +1,10 @@
 import { Reducer, SetStateAction, ReducerState, ReducerAction, Dispatch } from 'react';
 import { UpdatePlugin } from './tele-state';
+export declare const createTeleReducers: <R extends Reducer<any, any>>(reducers: R, initState: ReducerState<R>) => {
+    useTeleReducer: () => [ReducerState<R>, Dispatch<ReducerAction<R>>];
+    reset: () => void;
+    apply: (plugin: UpdatePlugin<ReducerState<R>>) => void;
+};
 declare const createTeleReducer: <R extends Reducer<any, any>>(reducer: R, initState: ReducerState<R>) => {
     useTeleReducer: () => [ReducerState<R>, Dispatch<ReducerAction<R>>];
     reset: () => void;

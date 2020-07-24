@@ -15,25 +15,16 @@ const useTele = <R extends Reducer<any, any>>(
 }
 
 
-// type Reducers<R extends Reducer<any,any>> = {[actionName: string]: R}
-// type ReducersReducer<RS extends Reducers<any>> =   RS extends Reducers<infer R>? R : never
-type ReducersReducer<S> = <P>(s: S, paload: P) => S
-type Reducers<S> = { [actionName: string]: ReducersReducer<S> }
-type ReducersState<RS extends Reducers<any>> = RS extends  Reducers<infer S>? S: never
-type ReducersPalyLoad<RS extends Reducers<any>, T extends keyof RS> = 
- RS[T] extends ReducersReducer<ReducersState<RS>, infer P>? P :
- never
-type ReducersAction<RS extends Reducers<any>, T extends keyof RS> = {type: T, payLoad:  ReducersPalyLoad<RS, T>}
 
-export const createTeleReducers = <RS extends Reducers<any>>(reducers: RS, initState: ReducersState<RS> ) =>{
+export const createTeleReducers = <R extends Reducer<any,any>>(reducers: R, initState: ReducerState<R> ) =>{
 
-  const reducer = <T extends keyof RS>(preState:ReducersState<RS>, action: ReducersAction<RS, T>  ) => {
+  const reducer = <T extends keyof R>(preState:ReducerState<R>, action: ReducerAction<R>  ) => {
     
     return reducers[action.type](preState, action.payLoad)
   }
   return createTeleReducer<Reducer<
-  ReducersState<RS>,
-  ReducersAction<RS, keyof RS>
+  ReducerState<R>,
+  ReducerAction<R>
   >>(reducer, initState)
 }
 
@@ -67,15 +58,3 @@ const createTeleState = <S>(initialState: SetStateAction<S>) => {
 
 
 export { createTeleReducer, createTeleState }
-
-interface RReducers extends Reducers<number> {
-  add: (s:number, p: number) => number
-  // remove:(s:number) => number
-}
-const reducers: RReducers = {
-  add: (s:number, p: number) => s + a,
-
-}
-const { useTeleReducer }= createTeleReducers(reducers, 1)
-const [ a, d ] = useTeleReducer()
-d({ type: 'add', payLoad: })

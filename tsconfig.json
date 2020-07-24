@@ -4,10 +4,10 @@
     "moduleResolution": "Node",
     "rootDir": "src",
     "lib": ["ESNext", "DOM"],
-    "module": "ES2015",
+    "module": "UMD",
     "target": "ES3",
     "outDir": "lib",
     "declaration": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
   },
 }
