@@ -20,6 +20,6 @@ export declare class TeleState<S, A> implements TeleStateInterface<S, A> {
     dispatch: (action: A) => void;
     setState: (value: S) => void;
     apply: (plugin: UpdatePlugin<S>) => void;
-    protected handleUpdate(pre: S, newS: S): void;
+    protected handleUpdate(pre: S, newS: S): Promise<void>;
     protected handlePlugin(pre: S, newS: S): void;
 }
