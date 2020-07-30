@@ -1,6 +1,6 @@
 {
   "name": "tele-state",
-  "version": "1.0.7",
+  "version": "1.0.10",
   "description": "shared state with react hooks",
   "main": "lib/index.js",
   "scripts": {

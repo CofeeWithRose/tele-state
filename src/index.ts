@@ -18,7 +18,7 @@ const useTele = <R extends Reducer<any, any>>(
 
 export const createTeleReducers = <R extends Reducer<any,any>>(reducers: R, initState: ReducerState<R> ) =>{
 
-  const reducer = <T extends keyof R>(preState:ReducerState<R>, action: ReducerAction<R>  ) => {
+  const reducer = (preState:ReducerState<R>, action: ReducerAction<R>  ) => {
     
     return reducers[action.type](preState, action.payLoad)
   }
@@ -52,5 +52,6 @@ const createTeleState = <S>(initialState: SetStateAction<S>) => {
     ...rest,
   }
 }
+
 
 export { createTeleReducer, createTeleState }

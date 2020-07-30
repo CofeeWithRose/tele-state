@@ -37,8 +37,13 @@ export class TeleState<S, A> implements TeleStateInterface<S, A> {
     this.updatePlugins.push(plugin)
   }
 
-  protected handleUpdate(pre:S, newS:S){
+  protected async handleUpdate(pre:S, newS:S){
     this.handlePlugin(pre, newS)
+    /**
+     * Avoid Cannot update a component from inside the function body of a different component error.
+     * https://github.com/facebook/react/issues/18178#issuecomment-595846312
+     */
+    await Promise.reject()
     Object.values(this.setStateMap).forEach( setState => setState(newS) )
   }
 
