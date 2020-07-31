@@ -5,7 +5,7 @@ export type UpdatePlugin<S> = (newState: S, preState: S) => void
 export interface TeleStateInterface<S, A> {
   value: S
   dispatch: Dispatch<A>
-  readonly setStateMap: { [id: number]: Dispatch<SetStateAction<S>> }
+  readonly setStateMap: { [id: number]: [S, Dispatch<SetStateAction<S>>] }
   setState: (initValue: S) => void
   apply: (plugin: UpdatePlugin<S>) => void
 }
@@ -17,7 +17,7 @@ export class TeleState<S, A> implements TeleStateInterface<S, A> {
      public reducer: (s:S, a: A) => S 
   ){}
 
-  public readonly setStateMap: { [id: number]: Dispatch<SetStateAction<S>> } = {}
+  public readonly setStateMap: { [id: number]: [S, Dispatch<SetStateAction<S>>] } = {}
 
   public updatePlugins: UpdatePlugin<S>[] = []
 
@@ -44,7 +44,7 @@ export class TeleState<S, A> implements TeleStateInterface<S, A> {
      * https://github.com/facebook/react/issues/18178#issuecomment-595846312
      */
     await Promise.resolve()
-    Object.values(this.setStateMap).forEach( setState => setState(newS) )
+    Object.values(this.setStateMap).forEach( ([ curState, setState]) => curState!==newS && setState(newS) )
   }
 
   protected handlePlugin(pre:S, newS: S){

@@ -6,9 +6,9 @@ let stateId = 0
 const useTele = <R extends Reducer<any, any>>( 
   teleState: TeleStateInterface<ReducerState<R>, ReducerAction<R>> 
   ) => {
-  const [ _, setState ]= useState<ReducerState<R>>(teleState.value)
+  const [ , setState ]= useState<ReducerState<R>>(teleState.value)
   const idRef = useRef(useMemo(() => stateId++, []))
-  teleState.setStateMap[idRef.current] = setState
+  teleState.setStateMap[idRef.current] = [teleState.value, setState]
   useEffect(() => () =>{delete teleState.setStateMap[idRef.current]} ,[])
   const result:[ReducerState<R>, Dispatch<ReducerAction<R>>] =  [ teleState.value, teleState.dispatch ]
   return result

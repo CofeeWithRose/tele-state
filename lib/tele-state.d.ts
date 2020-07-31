@@ -4,7 +4,7 @@ export interface TeleStateInterface<S, A> {
     value: S;
     dispatch: Dispatch<A>;
     readonly setStateMap: {
-        [id: number]: Dispatch<SetStateAction<S>>;
+        [id: number]: [S, Dispatch<SetStateAction<S>>];
     };
     setState: (initValue: S) => void;
     apply: (plugin: UpdatePlugin<S>) => void;
@@ -14,7 +14,7 @@ export declare class TeleState<S, A> implements TeleStateInterface<S, A> {
     reducer: (s: S, a: A) => S;
     constructor(value: S, reducer: (s: S, a: A) => S);
     readonly setStateMap: {
-        [id: number]: Dispatch<SetStateAction<S>>;
+        [id: number]: [S, Dispatch<SetStateAction<S>>];
     };
     updatePlugins: UpdatePlugin<S>[];
     dispatch: (action: A) => void;
