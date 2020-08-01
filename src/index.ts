@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, Reducer, SetStateAction, ReducerState, ReducerAction, Dispatch, useEffect, useCallback } from 'react'
-import {  TeleStateInterface, TeleState, UpdatePlugin } from './tele-state'
+import {  TeleStateInterface, TeleState } from './tele-state'
 
 let stateId = 0
 
@@ -8,7 +8,7 @@ const useTele = <R extends Reducer<any, any>>(
   ) => {
   const [ , setState ]= useState<ReducerState<R>>(teleState.value)
   const idRef = useRef(useMemo(() => stateId++, []))
-  teleState.setStateMap[idRef.current] = [teleState.value, setState]
+  teleState.setStateMap[idRef.current] = setState
   useEffect(() => () =>{delete teleState.setStateMap[idRef.current]} ,[])
   const result:[ReducerState<R>, Dispatch<ReducerAction<R>>] =  [ teleState.value, teleState.dispatch ]
   return result
