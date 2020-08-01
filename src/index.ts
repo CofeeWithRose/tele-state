@@ -39,7 +39,7 @@ const createTeleReducer = <R extends Reducer<any, any>>(
     useTeleReducer: () => useTele<R>(teleState),
     reset: () => teleState.setState(initState),
     apply: teleState.apply,
-    
+    dispatch: teleState.dispatch,
   }
 }
 

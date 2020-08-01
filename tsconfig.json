@@ -2,7 +2,7 @@
   "compilerOptions": {
     "jsx": "preserve",
     "moduleResolution": "Node",
-    "rootDir": "src",
+    "rootDir": "./src",
     "lib": ["ESNext", "DOM"],
     "module": "ES6",
     "target": "ES3",
@@ -10,4 +10,5 @@
     "declaration": true,
     "allowSyntheticDefaultImports": true,
   },
+  "exclude": ["stories","lib"]
 }
