@@ -43,6 +43,28 @@ const { useTeleState } = createTeleState(1)
 
 ```
 
+### useState out of component
+
+```
+import React, { useEffect } from 'react'
+
+import { createTeleState } from 'tele-state'
+
+
+const { 
+  useTeleState, 
+  dispatch, // used to  update state sync ,but render is async out of component\hooks.
+  getState, // used to getState out of component\hooks.
+} = createTeleState(1)
+
+export addCount = async () => {
+  // update teleState sync.
+  dispatch(preCount => preCount +1 )
+  const count = getState()  // get updated state.
+  await fetch(`/api/sendCount?count=${count}`) 
+}
+```
+
 ## Demos
 
 ### useTeleState
