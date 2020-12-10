@@ -76,11 +76,43 @@ void main(){
 `
 
 const vertShaderStr = `
-attribute vec4 a_position;
+attribute vec2 a_position;
+
+uniform vec2 w_size;
+
 void main(){
-    gl_Position = a_position;
+  gl_Position = vec4( (a_position/w_size *2.0 -1.0) * vec2(1, -1) , 0, 1 );
 }
 `
+
+const positions = [
+  // -100,-100,
+  // 100,100,
+  // -100,0,
+
+  // 200,200,
+  // 300,300,
+  // 200,300,
+];
+const wCount = 1000
+const hCount = 100
+
+const pad = 0.1
+const w = (1400/ wCount)-pad
+const h = (800/ hCount) - pad
+for(let i =0 ; i< wCount; i++){
+  for(let j = 0; j< hCount; j++ ){
+    const start = {x: (w + pad) * i, y: (h + pad)* j}
+    const angle = [
+     start.x, start.y,
+     start.x, start.y+h,
+     start.x + w, start.y+h  
+    ]
+    positions.push(...angle)
+  }
+}
+
+
 
 const Test = () => {
   
@@ -108,21 +140,17 @@ const Test = () => {
     gl.linkProgram(program)
     console.log('link program', gl.getProgramParameter(program, gl.LINK_STATUS))
 
-    const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 
     const positionBuffer = gl.createBuffer();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-    var positions = [
-      0, 0,
-      0, 0.5,
-      0.7, 0,
-    ];
+ 
+    const buffer = new Float32Array(positions)
 
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
 
-    gl.viewport(0, 0, 1440, 800)
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -130,7 +158,12 @@ const Test = () => {
     
     gl.useProgram(program)
 
+    const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+
     gl.enableVertexAttribArray(positionAttributeLocation);
+
+    const viewSize = gl.getUniformLocation(program, 'w_size')
+    gl.uniform2f(viewSize, gl.canvas.width, gl.canvas.height)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
@@ -146,13 +179,24 @@ const Test = () => {
 
 
     const primitiveType = gl.TRIANGLES;
-    var count = 3;
-    gl.drawArrays(primitiveType, offset, count);
+    var count =positions.length;
+    // gl.drawArrays(primitiveType, offset, count);
+    // buffer[0] = 1
+    // buffer[1] = 1
+    // gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
+    // gl.drawArrays(primitiveType, offset, count);
+
+    const draw = () => {
+      gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
+      gl.drawArrays(primitiveType, offset, count);
+      requestAnimationFrame(draw)
+    }
+    draw()
 
   }, [])
 
   return <>
-   <canvas ref={cRef} width={1440} height={800} ></canvas>
+   <canvas ref={cRef} width={1400} height={800} ></canvas>
   </>
 }
 

@@ -1,15 +1,7 @@
-attribute vec4 a_position;
+attribute vec2 a_position;
+
+uniform vec2 w_size;
+
 void main(){
-    gl_Position = a_position;
+  gl_Position = vec4( (a_position/ w_size) * 2.0 -1.0 ,0 ,1);
 }
-
-
-  // 一个属性变量，将会从缓冲中获取数据
-  attribute vec4 a_position;
- 
-  // 所有着色器都有一个main方法
-  void main() {
- 
-    // gl_Position 是一个顶点着色器主要设置的变量
-    gl_Position = a_position;
-  }
