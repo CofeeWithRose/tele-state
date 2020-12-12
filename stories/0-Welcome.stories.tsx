@@ -1,71 +1,6 @@
-import React, { useMemo, useEffect, useRef } from 'react';
-import { linkTo } from '@storybook/addon-links';
-// import { Welcome } from '@storybook/react/demo';
-import { createTeleState } from '../lib/index'
-
-// const { useTeleState } = createTeleState(1);
-// // const { useTeleState: useLog, dispatch} = createTeleState<string[][]>([])
-// // const log = (...logs: any[]) => dispatch(pre => [...pre, logs])
-// const ComponentA = () => {
-//   const [ count, setCount ] = useTeleState()
-//   // useMemo(() =>setCount(7),[] )
-//   useEffect(() => {
-//     console.log(`ComponentA useEffect--`, count)
-//   }, [count])
-//   console.log('ComponentA render--', count)
- 
-//   return <div>
-//     <button
-//       onClick={() => setCount(count+1)}
-//     >
-//       ComponentA{count}
-//     </button>
-//     <ComponentB count={count}/>
-//   </div>
-// }
-// const ComponentB = ({count:c=1, type="B" }) => {
-//   const [ count, setCount ] = useTeleState()
-//   // useMemo(() =>setCount(7),[] )
-//   console.log(`Component${type} render--`, count)
-//   useEffect(() => {
-//     console.log(`Component${type} useEffect--`, count)
-//   }, [count])
-//   return <button
-//     onClick={() => setCount(count+1)}
-//   >
-//     Component{type}{count} ...{c}
-//   </button>
-// }
-
-// const tC = document.createElement('canvas')
-// const size = 5
-// tC.width =size
-// tC.height =size
-// const ctx = tC.getContext('2d')
-// // ctx.rotate(45 * Math.PI /180)
-// ctx.fillRect(0,0, size, size)
-
-// const tC2 = document.createElement('canvas')
-
-// tC2.width =size
-// tC2.height =size
-// const ctx2 = tC2.getContext('2d')
-// ctx2.fillStyle = 'red'
-// // ctx.rotate(45 * Math.PI /180)
-// ctx2.fillRect(0,0, size, size)
+import React, { useEffect, useRef } from 'react';
 
 
-
-
-// const bRecList = []
-// for(let i =0; i< 280; i++) {
-
-//   for(let j=0; j< 140; j++){
-//     bRecList.push({ x: i*12, y: j*12  })
-//     // bRecList.push({ x: i*6.1, y: j*6.1  })
-//   } 
- 
-// } 
 
 const vertShaderStr = `
 
@@ -121,13 +56,11 @@ void main(){
   if (v_type >0.0 && v_type <= 1.0) {
     // circle;
     float dist = distance( ceil(v_position), ceil(vec2(gl_FragCoord.x, v_windowSize.y - gl_FragCoord.y))  );
-    if(ceil(dist)> ceil(v_size.x)) {
-      discard;
-    }else{
+    if(ceil(dist)< ceil(v_size.x)) {
       gl_FragColor = vec4 (v_color.x, v_color.y, v_color.z, smoothstep( v_size.x, v_size.x-2.0, dist));  
-      // gl_FragColor = v_color;  
+    }else{
+      discard;
     }
-    // gl_FragColor = v_color;
     return;
   }
 
@@ -136,7 +69,7 @@ void main(){
     gl_FragColor = v_color;
     return;
   }
- 
+  gl_FragColor = v_color;
   
 }
 `
@@ -168,10 +101,10 @@ const shapeType = [
   // 1,
   // 2,
 ]
-const canvasWidth = 1400
-const canvasHeight = 1400
-const wCount = 100
-const hCount = 100
+const canvasWidth = 14000
+const canvasHeight = 800
+const wCount = 760
+const hCount = 35
 
 const pad = 2
 const w = (canvasWidth/ wCount)-pad
@@ -225,7 +158,7 @@ const Test = () => {
 
   useEffect(() => {
     if(!cRef.current) return
-    const gl = glRef.current = cRef.current.getContext('webgl', { alpha: true })
+    const gl = glRef.current = cRef.current.getContext('webgl', { alpha: true, powerPreference: 'high-performance' })
     const program = gl.createProgram()
     if(!program ) return
 
