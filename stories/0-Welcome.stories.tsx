@@ -78,6 +78,7 @@ attribute float a_r;
 varying vec4 v_color;
 varying float v_r;
 varying vec2 v_position;
+varying vec2 v_windowSize;
 
 void main(){
   v_color = a_color;
@@ -85,7 +86,9 @@ void main(){
   v_position = a_position;
 
   v_r = a_r;
-  gl_PointSize = a_r*2.0;
+  gl_PointSize = 2.0* a_r;
+
+  v_windowSize = u_windowSize;
 }
 `
 
@@ -95,16 +98,18 @@ precision highp float;
 varying vec4 v_color;
 varying float v_r;
 varying vec2 v_position;
+varying vec2 v_windowSize;
 
 // gl_FragCoord
 // gl_PointCoord
 void main(){
 
-  float dist = distance( vec2(0.5,0.5), gl_PointCoord  );
-  if(dist> 0.5) {
+  float dist = distance( v_position, vec2(gl_FragCoord.x, v_windowSize.y - gl_FragCoord.y)  );
+  if(dist> v_r) {
     discard;
   }else{
-    gl_FragColor = v_color;    
+    // * smoothstep( v_r, v_r-0.0001,  dist)
+    gl_FragColor = vec4(v_color.x, v_color.y, v_color.z, v_color.w );    
   }
 }
 `
@@ -112,7 +117,7 @@ void main(){
 
 
 const positions = [
-  // 0,0,
+  // 200, 200,
   // 300,300,
   // 600,300,
 
@@ -131,7 +136,7 @@ const colors = [
   // ...c,
 ]
 const r = [
-  // 500,
+  // 100,
   // 10,
   // 50,
   
@@ -140,8 +145,8 @@ const r = [
   // 50,
 ]
 
-const wCount = 200
-const hCount = 100
+const wCount = 500
+const hCount = 200
 
 const pad = 0.1
 const w = (1400/ wCount)-pad
@@ -170,7 +175,7 @@ const Test = () => {
 
   useEffect(() => {
     if(!cRef.current) return
-    const gl = glRef.current = cRef.current.getContext('webgl')
+    const gl = glRef.current = cRef.current.getContext('webgl', { alpha: true })
     const program = gl.createProgram()
     if(!program ) return
 
@@ -253,6 +258,8 @@ const Test = () => {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     
 
@@ -270,15 +277,15 @@ const Test = () => {
       positionArray.forEach((_, ind) =>   positionArray[ind] += 0.1 )
       gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
       gl.drawArrays(primitiveType, offset, count);
-      requestAnimationFrame(draw)
+      // requestAnimationFrame(draw)
     }
     draw()
 
   }, [])
 
-  return <>
+  return <div style={{ backgroundColor: 'black' }} >
    <canvas ref={cRef} width={1400} height={800} ></canvas>
-  </>
+  </ div >
 }
 
 
