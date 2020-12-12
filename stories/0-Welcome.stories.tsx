@@ -67,34 +67,80 @@ import { createTeleState } from '../lib/index'
  
 // } 
 
+const vertShaderStr = `
+
+uniform vec2 u_windowSize;
+
+attribute vec2 a_position;
+attribute vec4 a_color;
+attribute float a_r;
+
+varying vec4 v_color;
+varying float v_r;
+varying vec2 v_position;
+
+void main(){
+  v_color = a_color;
+  gl_Position = vec4((a_position/u_windowSize *2.0 -1.0) * vec2(1, -1), 0, 1 );
+  v_position = a_position;
+
+  v_r = a_r;
+  gl_PointSize = a_r*2.0;
+}
+`
 
 const fgShaderStr = `
-precision mediump float;
+precision highp float;
+
+varying vec4 v_color;
+varying float v_r;
+varying vec2 v_position;
+
+// gl_FragCoord
+// gl_PointCoord
 void main(){
-    gl_FragColor = vec4(1,0,0.51, 0.8);    
+
+  float dist = distance( vec2(0.5,0.5), gl_PointCoord  );
+  if(dist> 0.5) {
+    discard;
+  }else{
+    gl_FragColor = v_color;    
+  }
 }
 `
 
-const vertShaderStr = `
-attribute vec2 a_position;
 
-uniform vec2 w_size;
-
-void main(){
-  gl_Position = vec4( (a_position/w_size *2.0 -1.0) * vec2(1, -1) , 0, 1 );
-}
-`
 
 const positions = [
-  // -100,-100,
-  // 100,100,
-  // -100,0,
-
-  // 200,200,
+  // 0,0,
   // 300,300,
-  // 200,300,
+  // 600,300,
+
+  // 100,100,
+  // 200,200,
+  // 100,200,
 ];
-const wCount = 1000
+const c = [ 0,0,0,1]
+const colors = [
+  // 1,0,0,1,
+  // 0,1,0,1,
+  // 0,0,1,1,
+
+  // ...c,
+  // ...c,
+  // ...c,
+]
+const r = [
+  // 500,
+  // 10,
+  // 50,
+  
+  // 10,
+  // 100,
+  // 50,
+]
+
+const wCount = 200
 const hCount = 100
 
 const pad = 0.1
@@ -102,15 +148,18 @@ const w = (1400/ wCount)-pad
 const h = (800/ hCount) - pad
 for(let i =0 ; i< wCount; i++){
   for(let j = 0; j< hCount; j++ ){
-    const start = {x: (w + pad) * i, y: (h + pad)* j}
-    const angle = [
-     start.x, start.y,
-     start.x, start.y+h,
-     start.x + w, start.y+h  
-    ]
-    positions.push(...angle)
+    const start = {x: (w + pad) * i + 0.5 *w , y: (h + pad)* j}
+    // const angle = [
+    //  start.x, start.y,
+    //  start.x, start.y+h,
+    //  start.x + w, start.y+h  
+    // ]
+    positions.push(start.x, start.y)
+    colors.push(1,0,0,1)
+    r.push(w * 0.5)
   }
 }
+
 
 
 
@@ -142,13 +191,52 @@ const Test = () => {
 
 
     const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+    const positionArray = new Float32Array(positions)
+    gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
+    const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+    gl.enableVertexAttribArray(positionAttributeLocation);
+    // 告诉属性怎么从positionBuffer中读取数据 (ARRAY_BUFFER)
+    let size = 2;          // 每次迭代运行提取两个单位数据
+    let type = gl.FLOAT;   // 每个单位的数据类型是32位浮点型
+    let normalize = false; // 不需要归一化数据
+    let stride = 0;        // 0 = 移动单位数量 * 每个单位占用内存（sizeof(type)）
+                          // 每次迭代运行运动多少内存到下一个数据开始点
+    let offset = 0;        // 从缓冲起始位置开始读取
+    gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset)
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    const colorBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
+    const colorArray = new Uint8Array(colors)
+    gl.bufferData(gl.ARRAY_BUFFER, colorArray, gl.STATIC_DRAW);
+    const colorAttributeLocation = gl.getAttribLocation(program, "a_color");
+    gl.enableVertexAttribArray(colorAttributeLocation);
+    // 告诉属性怎么从positionBuffer中读取数据 (ARRAY_BUFFER)
+    size = 4;          // 每次迭代运行提取两个单位数据
+    type = gl.UNSIGNED_BYTE;   // 每个单位的数据类型是32位浮点型
+    normalize = false; // 不需要归一化数据
+    stride = 0;        // 0 = 移动单位数量 * 每个单位占用内存（sizeof(type)）
+                          // 每次迭代运行运动多少内存到下一个数据开始点
+    offset = 0;        // 从缓冲起始位置开始读取
+    gl.vertexAttribPointer(colorAttributeLocation, size, type, normalize, stride, offset)
 
- 
-    const buffer = new Float32Array(positions)
 
-    gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
+    const raduisBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, raduisBuffer)
+    const raduisArray = new Float32Array(r)
+    gl.bufferData(gl.ARRAY_BUFFER, raduisArray, gl.STATIC_DRAW);
+    const raduisAttributeLocation = gl.getAttribLocation(program, "a_r");
+    gl.enableVertexAttribArray(raduisAttributeLocation);
+    // 告诉属性怎么从positionBuffer中读取数据 (ARRAY_BUFFER)
+    size = 1;          // 每次迭代运行提取两个单位数据
+    type = gl.FLOAT;   // 每个单位的数据类型是32位浮点型
+    normalize = false; // 不需要归一化数据
+    stride = 0;        // 0 = 移动单位数量 * 每个单位占用内存（sizeof(type)）
+                          // 每次迭代运行运动多少内存到下一个数据开始点
+    offset = 0;        // 从缓冲起始位置开始读取
+    gl.vertexAttribPointer(raduisAttributeLocation, size, type, normalize, stride, offset)
+
+    
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
@@ -158,36 +246,29 @@ const Test = () => {
     
     gl.useProgram(program)
 
-    const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+    
 
-    gl.enableVertexAttribArray(positionAttributeLocation);
-
-    const viewSize = gl.getUniformLocation(program, 'w_size')
+    const viewSize = gl.getUniformLocation(program, 'u_windowSize')
     gl.uniform2f(viewSize, gl.canvas.width, gl.canvas.height)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
 
-    // 告诉属性怎么从positionBuffer中读取数据 (ARRAY_BUFFER)
-    const size = 2;          // 每次迭代运行提取两个单位数据
-    const type = gl.FLOAT;   // 每个单位的数据类型是32位浮点型
-    const normalize = false; // 不需要归一化数据
-    const  stride = 0;        // 0 = 移动单位数量 * 每个单位占用内存（sizeof(type)）
-                          // 每次迭代运行运动多少内存到下一个数据开始点
-    const offset = 0;        // 从缓冲起始位置开始读取
-    gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset)
+    
 
 
-    const primitiveType = gl.TRIANGLES;
-    var count =positions.length;
+  
     // gl.drawArrays(primitiveType, offset, count);
     // buffer[0] = 1
     // buffer[1] = 1
     // gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
     // gl.drawArrays(primitiveType, offset, count);
 
+    const primitiveType = gl.POINTS;
+    var count =positions.length/2;
     const draw = () => {
-      gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
+      positionArray.forEach((_, ind) =>   positionArray[ind] += 0.1 )
+      gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
       gl.drawArrays(primitiveType, offset, count);
       requestAnimationFrame(draw)
     }
