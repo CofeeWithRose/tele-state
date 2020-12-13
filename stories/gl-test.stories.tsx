@@ -101,10 +101,10 @@ const shapeType = [
   // 1,
   // 2,
 ]
-const canvasWidth = 14000
-const canvasHeight = 800
-const wCount = 760
-const hCount = 35
+const canvasWidth = 2400
+const canvasHeight =2400
+const wCount = 250
+const hCount = 250
 
 const pad = 2
 const w = (canvasWidth/ wCount)-pad
@@ -259,8 +259,19 @@ const Test = () => {
     // offset = 0;        // 从缓冲起始位置开始读取
     gl.vertexAttribPointer(shaderAttribuites.a_size, 2, gl.FLOAT, false, 0, 0)
 
-
+    const fpsDiv = document.querySelector('#fps')
+    let lastTime = performance.now()
+    let frameCount = 0
     const draw = () => {
+      frameCount++
+      const now = performance.now()
+
+      if(now - lastTime >=1000){
+        const preFrameSeconds = (now - lastTime) * 0.001/ frameCount
+        fpsDiv.innerHTML ='fps: '+ Math.round(1/preFrameSeconds)
+        frameCount = 0;
+        lastTime = now;
+      }
       positionArray.forEach((_, ind) =>  {
         positionArray[ind] += 0.1
       })
@@ -276,6 +287,15 @@ const Test = () => {
 
   return <div style={{ backgroundColor: 'black' }} >
    <canvas ref={cRef} width={canvasWidth} height={canvasHeight} style={{ width : canvasWidth / devicePixelRatio, height: canvasHeight/devicePixelRatio}} ></canvas>
+  <div 
+    id="fps"
+    style={{
+      backgroundColor:'white',
+      position: 'fixed',
+      left: 0,
+      top: 0,
+    }}
+  />
   </ div >
 }
 
