@@ -103,10 +103,10 @@ const shapeType = [
 ]
 const canvasWidth = 2400
 const canvasHeight =2400
-const wCount = 250
-const hCount = 250
+const wCount = 200
+const hCount = 200
 
-const pad = 2
+const pad = 5
 const w = (canvasWidth/ wCount)-pad
 const h = (canvasHeight/ hCount) - pad
 for(let i =0 ; i< wCount; i++){
@@ -138,7 +138,6 @@ for(let i =0 ; i< wCount; i++){
     shapColor.push(0.8,0.15,0.2,1)
     shapSize.push(halfR, 0)
     shapeType.push(2)
-
 
   }
 }
@@ -273,7 +272,9 @@ const Test = () => {
         lastTime = now;
       }
       positionArray.forEach((_, ind) =>  {
-        positionArray[ind] += 0.1
+        if(ind%2){
+          positionArray[ind] += 1
+        }
       })
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
       gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
@@ -306,7 +307,7 @@ export default {
   component: Test,
 };
 
-export const ToStorybook = () => <Test />;
+export const ToStorybook = () => <Test/>;
 
 ToStorybook.story = {
   name: 'webgl',

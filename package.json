@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run dev",
     "build": "tsc&&node ./build/index.js",
-    "dev": "tsc --watch | start-storybook -p 6006",
+    "dev": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "author": "cofeewithrose",
