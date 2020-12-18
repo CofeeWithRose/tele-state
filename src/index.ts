@@ -73,7 +73,7 @@ export class GLRender {
 
     private texture: WebGLTexture
 
-    constructor( glCanvas: HTMLCanvasElement, private options = { bufferSize: 5000 }  ){
+    constructor( glCanvas: HTMLCanvasElement, private options = { bufferSize:100000 }  ){
         this.gl = glCanvas.getContext('webgl', { alpha: true })
         const program = this.gl.createProgram()
         compileShader(this.gl, program, VERTEX_SHADER,SHADER_TYPE.VERTEX_SHADER )
