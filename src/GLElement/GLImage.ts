@@ -5,7 +5,7 @@ export class GlImage extends GLElement  {
 
     constructor( 
       private updatePosition: () => void,
-      private initInfo : { imgId: number,  position: Vec2},
+      initInfo : { imgId: number,  position: Vec2},
      ){
       super()
       this.position = initInfo.position
@@ -15,6 +15,7 @@ export class GlImage extends GLElement  {
     setPosition(x: number, y: number){
         this.position.x = x
         this.position.y = y
+        this.updatePosition()
     }
     
 }

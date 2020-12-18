@@ -71,7 +71,9 @@ export class GLRender {
 
     private rafing = false
 
-    constructor( glCanvas: HTMLCanvasElement, private options = { bufferSize: 100 }  ){
+    private texture: WebGLTexture
+
+    constructor( glCanvas: HTMLCanvasElement, private options = { bufferSize: 5000 }  ){
         this.gl = glCanvas.getContext('webgl', { alpha: true })
         const program = this.gl.createProgram()
         compileShader(this.gl, program, VERTEX_SHADER,SHADER_TYPE.VERTEX_SHADER )
@@ -104,6 +106,7 @@ export class GLRender {
             this.attrData.a_texCoord.fill(0)
             
         }
+        
 
         this.elemetList.forEach(({ position, imgId }, index) => {
 
@@ -145,7 +148,6 @@ export class GLRender {
 
                 this.attrData.a_size[startIndex+4] = w
                 this.attrData.a_size[startIndex + 5] = h
-
             }
 
         })
@@ -162,6 +164,9 @@ export class GLRender {
 
             this.gl.bindBuffer( this.gl.ARRAY_BUFFER, this.attrBuffer.a_size )
             this.gl.bufferData(this.gl.ARRAY_BUFFER, this.attrData.a_size, this.gl.STATIC_DRAW)
+
+            this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture)
+            this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.textureCanvas.canvas)
         }
 
         this.positionChanged = false
@@ -171,8 +176,8 @@ export class GLRender {
     }
 
     private initTexture() {
-        const texture = this.gl.createTexture()
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture)
+        this.texture = this.gl.createTexture()
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture)
         // this.gl.texParameteri(this.gl.texImage2D,)
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
@@ -219,11 +224,15 @@ export class GLRender {
     }
   
     createElement<T extends GL_ELEMENT_TYPES>( type: T, params: GLElementParams[T] ): GLElements[T] {
-        const img =  new this.GLElemetMap[type](this.update, params)
+        const img =  new this.GLElemetMap[type](this.updatePosition, params)
         this.elemetList.push(img)
         this.needSort = true
         this.update()
         return img
+    }
+    private updatePosition = () => {
+        this.positionChanged = true
+        this.update()
     }
 
     destoryElement(ele: GLElement){

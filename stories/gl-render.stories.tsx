@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { GLRender, GL_ELEMENT_TYPES } from '../lib'
+import { GlImage } from '../lib/GLElement/GLImage';
 
 
 
@@ -12,15 +13,30 @@ function Test() {
     useEffect(() =>{
         const glRender = new GLRender(cRef.current)
         const c = document.createElement('canvas')
+        c.width = 100
+        c.height = 100
         const ctx = c.getContext('2d')
-        ctx.fillStyle= "white"
-        ctx.strokeStyle = 'black'
+        ctx.fillStyle= "red"
+        ctx.strokeStyle = 'red'
         ctx.arc(50,50,50,0,  Math.PI *2)
         ctx.fill()
         ctx.stroke()
         
         const [imgId] = glRender.loadImgs([c])
-        const glImg = glRender.createElement(GL_ELEMENT_TYPES.GL_IMAGE, { imgId, position: {x: 0, y:0} })
+        
+        const xCount = 50
+        const yCount = 50
+        const imgList:GlImage[] = []
+        for(let i =0; i< xCount; i++){
+          for( let j =0; j< yCount; j++ ){
+            imgList.push ( glRender.createElement(GL_ELEMENT_TYPES.GL_IMAGE, { imgId, position: {x: i *150 + 5 , y: j * 150 +5} }) )
+          }
+        }
+        const req = () => {
+          imgList.forEach( e => e.setPosition( e.position.x+0.1, e.position.y + 0.1 ) )
+          requestAnimationFrame(req)
+        }
+        req()
 
     }, [])
     // style={{ backgroundColor: 'black' }} 

@@ -31,6 +31,7 @@ export declare class GLRender {
     private positionChanged;
     private textureChanged;
     private rafing;
+    private texture;
     constructor(glCanvas: HTMLCanvasElement, options?: {
         bufferSize: number;
     });
@@ -39,6 +40,7 @@ export declare class GLRender {
     private initBuffer;
     setViewPort(): void;
     createElement<T extends GL_ELEMENT_TYPES>(type: T, params: GLElementParams[T]): GLElements[T];
+    private updatePosition;
     destoryElement(ele: GLElement): void;
     loadImgs(imgs: HTMLCanvasElement[]): number[];
     private update;

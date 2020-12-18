@@ -15,8 +15,10 @@ export class TextureCanvasManager {
       this.canvas.width = 1024
       this.canvas.height = 1024
       this.ctx = this.canvas.getContext('2d')
-      this.ctx.fillStyle='red'
-      this.ctx.fillRect(0,0, 1024,1024)
+      // this.ctx.fillStyle='red'
+      // this.ctx.fillRect(0,0, 30,30)
+      // this.ctx.arc(50,50,50,0,Math.PI *2)
+      // this.ctx.fill()
     }
   
     setImages(canvasList: HTMLCanvasElement[]): number[]{
@@ -24,7 +26,9 @@ export class TextureCanvasManager {
       const idList = []
   
       for( let i =0; i< canvasList.length; i++ ){
-        this.ctx.drawImage(canvasList[i], 0 , 0)
+        const c = canvasList[i]
+        this.ctx.drawImage(c, 0 , 0, c.width, c.height)
+        idList.push(this.id++)
       }
       return idList
     }
