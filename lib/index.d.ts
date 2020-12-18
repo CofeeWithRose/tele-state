@@ -1,20 +1,45 @@
-import { Reducer, SetStateAction, ReducerState, ReducerAction, Dispatch } from 'react';
-export declare const createTeleReducers: <R extends Reducer<any, any>>(reducers: R, initState: ReducerState<R>) => {
-    useTeleReducer: () => [ReducerState<R>, Dispatch<ReducerAction<R>>];
-    reset: () => void;
-    apply: (plugin: import("./tele-state").UpdatePlugin<ReducerState<R>>) => void;
-    dispatch: Dispatch<ReducerAction<R>>;
-};
-declare const createTeleReducer: <R extends Reducer<any, any>>(reducer: R, initState: ReducerState<R>) => {
-    useTeleReducer: () => [ReducerState<R>, Dispatch<ReducerAction<R>>];
-    reset: () => void;
-    apply: (plugin: import("./tele-state").UpdatePlugin<ReducerState<R>>) => void;
-    dispatch: Dispatch<ReducerAction<R>>;
-};
-declare const createTeleState: <S>(initialState: SetStateAction<S>) => {
-    reset: () => void;
-    apply: (plugin: import("./tele-state").UpdatePlugin<S>) => void;
-    dispatch: Dispatch<SetStateAction<S>>;
-    useTeleState: () => [S, Dispatch<SetStateAction<S>>];
-};
-export { createTeleReducer, createTeleState };
+import { GlImage } from './GLElement/GLImage';
+import { Vec2 } from './Data/Vec2';
+import { GLElement } from './GLElement/GLElement';
+export declare enum GL_ELEMENT_TYPES {
+    GL_IMAGE = "GL_IMAGE"
+}
+export interface GLElements {
+    [GL_ELEMENT_TYPES.GL_IMAGE]: GlImage;
+}
+export interface GLElementTypes {
+    [GL_ELEMENT_TYPES.GL_IMAGE]: typeof GlImage;
+}
+export interface GLElementParams {
+    [GL_ELEMENT_TYPES.GL_IMAGE]: {
+        imgId: number;
+        position: Vec2;
+    };
+}
+export declare class GLRender {
+    private options;
+    private textureCanvas;
+    private elemetList;
+    private id;
+    private GLElemetMap;
+    private gl;
+    private uniformLocations;
+    private attribuitesLocations;
+    private attrData;
+    private attrBuffer;
+    private needSort;
+    private positionChanged;
+    private textureChanged;
+    private rafing;
+    constructor(glCanvas: HTMLCanvasElement, options?: {
+        bufferSize: number;
+    });
+    private updateImidiatly;
+    private initTexture;
+    private initBuffer;
+    setViewPort(): void;
+    createElement<T extends GL_ELEMENT_TYPES>(type: T, params: GLElementParams[T]): GLElements[T];
+    destoryElement(ele: GLElement): void;
+    loadImgs(imgs: HTMLCanvasElement[]): number[];
+    private update;
+}

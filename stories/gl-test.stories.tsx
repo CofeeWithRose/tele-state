@@ -1,30 +1,67 @@
 import React, { useEffect, useRef } from 'react';
 
+/**
+ * 三角 3个顶点
+ * 
+ */
+
+
+
+
+//  interface GlAngle {
+//   p1: Vec2
+//   p2: Vec2
+//   p3: Vec2
+//   color: RGBA
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
 
 
 const vertShaderStr = `
 
 uniform vec2 u_windowSize;
 
-attribute vec2 a_position;
+attribute vec3 a_position;
 attribute vec4 a_color;
 attribute vec2 a_size;
-attribute float a_type; // 1:circle; 2: rectangle;
+attribute float a_type; // 1:circle; 2: rectangle;3 image;
 
 varying vec2 v_windowSize;
 varying vec4 v_color;
 varying vec2 v_size;
-varying vec2 v_position;
+varying vec3 v_position;
 varying float v_type;
 
 void main(){
   v_color = a_color;
   v_windowSize = u_windowSize;
-  v_position = a_position;
+  v_position = vec3(a_position.x, a_position.y, a_position.z);
   v_size = a_size;
   v_type = a_type;
 
-  gl_Position = vec4((a_position/u_windowSize *2.0 -1.0) * vec2(1, -1), 0, 1 );
+  vec2 position = vec2(v_position.x, v_position.y);
+  gl_Position = vec4((position/u_windowSize *2.0 -1.0) * vec2(1, -1), v_position.z, 1 );
   
   if (a_type >0.0 && a_type <= 1.0) {
     // circle;
@@ -46,7 +83,7 @@ precision highp float;
 varying vec2 v_windowSize;
 varying vec4 v_color;
 varying vec2 v_size;
-varying vec2 v_position;
+varying vec3 v_position;
 varying float v_type;
 
 
@@ -55,9 +92,11 @@ void main(){
 
   if (v_type >0.0 && v_type <= 1.0) {
     // circle;
-    float dist = distance( ceil(v_position), ceil(vec2(gl_FragCoord.x, v_windowSize.y - gl_FragCoord.y))  );
+    vec2 position = vec2(v_position.x, v_position.y);
+    float dist = distance( ceil(position), ceil(vec2(gl_FragCoord.x, v_windowSize.y - gl_FragCoord.y))  );
     if(ceil(dist)< ceil(v_size.x)) {
-      gl_FragColor = vec4 (v_color.x, v_color.y, v_color.z, smoothstep( v_size.x, v_size.x-2.0, dist));  
+      // smoothstep( v_size.x, v_size.x-2.0, dist)
+      gl_FragColor = vec4 (v_color.x, v_color.y, v_color.z, 1);  
     }else{
       discard;
     }
@@ -66,14 +105,17 @@ void main(){
 
   if (v_type>1.0 && v_type <= 2.0) {
     // rectangle
-    gl_FragColor = v_color;
+    // gl_FragColor = v_color;
     return;
   }
-  gl_FragColor = v_color;
+  // gl_FragColor = v_color;
   
 }
 `
-
+// const sortArray = []
+// for (let index = 0; index < 100000; index++) {
+//   sortArray.push(10000-index)
+// }
 
 
 const positions = [
@@ -103,10 +145,10 @@ const shapeType = [
 ]
 const canvasWidth = 2400
 const canvasHeight =2400
-const wCount = 200
-const hCount = 200
+const wCount = 10
+const hCount = 10
 
-const pad = 5
+const pad = 50
 const w = (canvasWidth/ wCount)-pad
 const h = (canvasHeight/ hCount) - pad
 for(let i =0 ; i< wCount; i++){
@@ -118,26 +160,26 @@ for(let i =0 ; i< wCount; i++){
     //  start.x + w, start.y+h  
     // ]
     const r = w * 0.5
-    positions.push(start.x, start.y)
+    positions.push(start.x, start.y, 1)
     shapColor.push(0.45,0.75,0.2,1)
     shapSize.push(r, 0)
     shapeType.push(1)
 
     const halfR = 0.5 * r
-    positions.push(start.x -halfR , start.y)
+    positions.push(start.x -r , start.y, 0.1)
     shapColor.push(0.25,0.45,0.2,1)
     shapSize.push(halfR, 0)
     shapeType.push(1)
 
-    positions.push(start.x + halfR , start.y)
+    positions.push(start.x + halfR , start.y, 1)
     shapColor.push(0.25,0.45,0.2,1)
     shapSize.push(halfR, 0)
     shapeType.push(1)
 
-    positions.push(start.x, start.y + r)
+    positions.push(start.x, start.y + r,1)
     shapColor.push(0.8,0.15,0.2,1)
     shapSize.push(halfR, 0)
-    shapeType.push(2)
+    shapeType.push(1)
 
   }
 }
@@ -165,11 +207,13 @@ const Test = () => {
     gl.shaderSource(vertexShader, vertShaderStr)
     gl.compileShader(vertexShader)
     console.log('compile vexShader',gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
+    console.log('vertexShader log',gl.getShaderInfoLog(vertexShader))
 
     const fragShader = gl.createShader(gl.FRAGMENT_SHADER)
     gl.shaderSource(fragShader, fgShaderStr)
     gl.compileShader(fragShader)
     console.log('compile fragShader', gl.getShaderParameter(fragShader, gl.COMPILE_STATUS))
+    console.log('fragShader log',gl.getShaderInfoLog(fragShader))
 
     gl.attachShader(program, vertexShader)
     gl.attachShader(program, fragShader)
@@ -195,8 +239,8 @@ const Test = () => {
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    // gl.clearColor(0, 0, 0, 0);
+    // gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -213,7 +257,7 @@ const Test = () => {
     // let stride = 0;        // 0 = 移动单位数量 * 每个单位占用内存（sizeof(type)）
     //                       // 每次迭代运行运动多少内存到下一个数据开始点
     // let offset = 0;        // 从缓冲起始位置开始读取
-    gl.vertexAttribPointer(shaderAttribuites.a_position, 2, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(shaderAttribuites.a_position, 3, gl.FLOAT, false, 0, 0)
 
     const shapeTypeBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, shapeTypeBuffer)
@@ -243,6 +287,9 @@ const Test = () => {
     // offset = 0;        // 从缓冲起始位置开始读取
     gl.vertexAttribPointer(shaderAttribuites.a_color, 4, gl.FLOAT, false, 0, 0)
 
+    gl.enable(gl.DEPTH_TEST)
+    gl.depthFunc(gl.LEQUAL)
+
 
     const sizeBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer)
@@ -271,15 +318,37 @@ const Test = () => {
         frameCount = 0;
         lastTime = now;
       }
-      positionArray.forEach((_, ind) =>  {
-        if(ind%2){
-          positionArray[ind] += 1
-        }
-      })
-      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
 
-      gl.drawArrays(gl.POINTS, 0, positions.length * 0.5);
+      // sortArray.sort(v =>v-frameCount)
+      // gl.clear(gl.DEPTH_BUFFER_BIT)
+      // gl.drawArrays(gl.POINTS, 0, positions.length * 0.5);
+
+      // gl.drawArrays(gl.POINTS, 0, positions.length * 0.5);
+
+      // positionArray.forEach((_, ind) =>  {
+      //   if(ind%2){
+      //     positionArray[ind] += 30
+      //   }
+      // })
+      
+
+      // const positionBuffer1 = gl.createBuffer();
+      // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer1)
+      // gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
+      // gl.enableVertexAttribArray(shaderAttribuites.a_position);
+      // // 告诉属性怎么从positionBuffer中读取数据 (ARRAY_BUFFER)
+      // // let size = 2;          // 每次迭代运行提取两个单位数据
+      // // let type = gl.FLOAT;   // 每个单位的数据类型是32位浮点型
+      // // let normalize = false; // 不需要归一化数据
+      // // let stride = 0;        // 0 = 移动单位数量 * 每个单位占用内存（sizeof(type)）
+      // //                       // 每次迭代运行运动多少内存到下一个数据开始点
+      // // let offset = 0;        // 从缓冲起始位置开始读取
+      // gl.vertexAttribPointer(shaderAttribuites.a_position, 2, gl.FLOAT, false, 0, 0)
+      // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer1);
+      // gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
+
+      // gl.drawArrays(gl.POINTS, 0, positions.length * 0.5);
+
       requestAnimationFrame(draw)
     }
     draw()
@@ -307,7 +376,7 @@ export default {
   component: Test,
 };
 
-export const ToStorybook = () => <Test/>;
+export const ToStorybook = () => <></>;
 
 ToStorybook.story = {
   name: 'webgl',

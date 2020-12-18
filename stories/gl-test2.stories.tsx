@@ -1,11 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 
-enum SHADER_TYPE {
-  VERTEX_SHADER='VERTEX_SHADER',
-  FRAGMENT_SHADER='FRAGMENT_SHADER',
-}
 
-type SHADER_TYPE_MAP = {[ key in SHADER_TYPE]: number}
 
 
 class Color { 
@@ -240,7 +235,7 @@ export function GLTest () {
 
 export default {
   title: 'GL TEST',
-  component: GLTest,
+  component: () => <></>,
 };
 
 // export const ToStorybook = () => <GLTest />;

@@ -4,7 +4,7 @@
   "description": "shared state with react hooks",
   "main": "lib/index.js",
   "scripts": {
-    "start": "npm run dev",
+    "start": "tsc -watch | npm run dev",
     "build": "tsc&&node ./build/index.js",
     "dev": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
