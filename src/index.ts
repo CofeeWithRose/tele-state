@@ -35,15 +35,16 @@ export class GLRender {
   
     private elemetList: GLElement[] = []
 
-    private id = 0;
-
     private GLElemetMap: GLElementTypes = {
         [GL_ELEMENT_TYPES.GL_IMAGE]: GlImage
     }
 
     private gl:WebGLRenderingContext;
 
-    private uniformLocations: { u_windowSize?: WebGLUniformLocation};
+    private uniformLocations: { 
+        u_windowSize: WebGLUniformLocation,
+        u_textureSize: WebGLUniformLocation,
+    };
 
     private attribuitesLocations: {
         a_position: number
@@ -73,7 +74,7 @@ export class GLRender {
 
     private texture: WebGLTexture
 
-    constructor( glCanvas: HTMLCanvasElement, private options = { bufferSize:100000 }  ){
+    constructor( glCanvas: HTMLCanvasElement, private options = { maxNumber:100000, textureSize: 2048 }  ){
         this.gl = glCanvas.getContext('webgl', { alpha: true })
         const program = this.gl.createProgram()
         compileShader(this.gl, program, VERTEX_SHADER,SHADER_TYPE.VERTEX_SHADER )
@@ -82,8 +83,10 @@ export class GLRender {
         this.gl.useProgram(program)
         this.gl.enable(this.gl.BLEND)
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA)
+
         this.uniformLocations = {
-            u_windowSize: this.gl.getUniformLocation(program, 'u_windowSize')
+            u_windowSize: this.gl.getUniformLocation(program, 'u_windowSize'),
+            u_textureSize: this.gl.getUniformLocation(program, 'u_textureSize')
         }
         this.attribuitesLocations = {
             a_position: this.gl.getAttribLocation(program, 'a_position'),
@@ -93,6 +96,10 @@ export class GLRender {
         this.initBuffer()
         this.initTexture()
         this.setViewPort()
+    }
+
+    getTexture = () => {
+        return this.textureCanvas.canvas
     }
 
     private updateImidiatly = () => {
@@ -107,7 +114,6 @@ export class GLRender {
             
         }
         
-
         this.elemetList.forEach(({ position, imgId }, index) => {
 
             if(this.positionChanged){
@@ -176,22 +182,24 @@ export class GLRender {
     }
 
     private initTexture() {
+        this.gl.uniform2f(this.uniformLocations.u_textureSize, this.options.textureSize, this.options.textureSize)
         this.texture = this.gl.createTexture()
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture)
         // this.gl.texParameteri(this.gl.texImage2D,)
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+        this.gl.texParameterf(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameterf(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameterf(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+        this.gl.texParameterf(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+        this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true)
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.textureCanvas.canvas)
     }
 
     private initBuffer(){
 
         this.attrData  = {
-            a_position: new Float32Array(this.options.bufferSize * 3 * 3 ),
-            a_size: new Float32Array(this.options.bufferSize * 3 *2 ),
-            a_texCoord: new Float32Array(this.options.bufferSize * 3 *2 ),
+            a_position: new Float32Array(this.options.maxNumber * 3 * 3 ),
+            a_size: new Float32Array(this.options.maxNumber * 3 *2 ),
+            a_texCoord: new Float32Array(this.options.maxNumber * 3 *2 ),
         }
         const positionBuffer = this.gl.createBuffer()
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer)

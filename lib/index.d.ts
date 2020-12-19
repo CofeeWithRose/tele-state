@@ -20,7 +20,6 @@ export declare class GLRender {
     private options;
     private textureCanvas;
     private elemetList;
-    private id;
     private GLElemetMap;
     private gl;
     private uniformLocations;
@@ -33,8 +32,10 @@ export declare class GLRender {
     private rafing;
     private texture;
     constructor(glCanvas: HTMLCanvasElement, options?: {
-        bufferSize: number;
+        maxNumber: number;
+        textureSize: number;
     });
+    getTexture: () => HTMLCanvasElement;
     private updateImidiatly;
     private initTexture;
     private initBuffer;

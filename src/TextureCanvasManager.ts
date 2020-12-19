@@ -24,15 +24,11 @@ export class TextureCanvasManager {
 
 
   
-    constructor(){
+    constructor( size= 2048){
       this.canvas = document.createElement('canvas')
-      this.canvas.width = 1024
-      this.canvas.height = 1024
+      this.canvas.width = size
+      this.canvas.height = size
       this.ctx = this.canvas.getContext('2d')
-      // this.ctx.fillStyle='red'
-      // this.ctx.fillRect(0,0, 30,30)
-      // this.ctx.arc(50,50,50,0,Math.PI *2)
-      // this.ctx.fill()
     }
   
     setImages(canvasList: HTMLCanvasElement[]): number[]{
@@ -60,21 +56,21 @@ export class TextureCanvasManager {
 
       if(this.curMaxHeight < h) this.curMaxHeight = h
 
-        const nextX = this.curX + w
-        
-        if(nextX >= this.canvas.width) {
-          //换行
-          this.curX = 1
-          this.curY += this.curMaxHeight
-          this.curMaxHeight = 0
-        }else{
-          this.curX = nextX
-        }
+      const nextX = this.curX + w + 1
+      
+      if(nextX >= this.canvas.width) {
+        //换行
+        this.curX = 1
+        this.curY += this.curMaxHeight +1
+        this.curMaxHeight = 0
+      }else{
+        this.curX = nextX
+      }
         // const nextHeight =  this.curLineHeight + c.height
     }
 
     getImageInfos(imgIds: number[]): {x: number, y: number, w: number, h: number}[] {
-      return [{x: 0, y: 0, w: 100, h: 100}]
+      return [this.positionInfo[imgIds[0]]]
     }
   
   }

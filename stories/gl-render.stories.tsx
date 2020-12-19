@@ -4,34 +4,42 @@ import { GlImage } from '../lib/GLElement/GLImage';
 
 
 
-const canvasWidth = 1400
-const canvasHeight = 800
+const canvasWidth = 1920
+const canvasHeight = 969
+
+const circleR = 10
 
 function Test() {
     const cRef = useRef()
 
+    const textureRef = useRef<HTMLCanvasElement>()
+
+    const glRenderRef  =  useRef<GLRender>()
+
     useEffect(() =>{
         const glRender = new GLRender(cRef.current)
+        glRenderRef.current = glRender
         const circle = document.createElement('canvas')
-        circle.width = 100
-        circle.height = 100
+        circle.width = circleR *2
+        circle.height = circleR *2
         const ctx = circle.getContext('2d')
-        ctx.fillStyle= "red"
-        ctx.arc(50,50,50,0,  Math.PI *2)
+        ctx.fillStyle= "black"
+        ctx.arc(circleR, circleR, circleR,0,  Math.PI *2)
         ctx.fill()
 
         
         const [circleImgId] = glRender.loadImgs([circle])
 
-        ctx.clearRect(0,0, 100, 100)
-        ctx.fillStyle= "green"
-        ctx.arc(50,50,50,0,  Math.PI)
+        ctx.clearRect(0,0, circleR *2, circleR *2)
+        ctx.fillStyle= "#a0a0a0"
+        ctx.arc(circleR, circleR, circleR, 0,  Math.PI *2 )
         ctx.fill()
 
         const [halfImgId] = glRender.loadImgs([circle])
         
-        const xCount = 20
+        const xCount = 200
         const yCount = 50
+        
         const imgList:GlImage[] = []
         for(let i =0; i< xCount; i++){
           for( let j =0; j< yCount; j++ ){
@@ -39,8 +47,8 @@ function Test() {
               glRender.createElement(
                 GL_ELEMENT_TYPES.GL_IMAGE, 
                 { 
-                  imgId: imgList.length%2? circleImgId : halfImgId, 
-                  position: {x: i *150 + 5 , y: j * 150 +5} 
+                  imgId: imgList.length%3? circleImgId : halfImgId, 
+                  position: {x: i *circleR *2  , y: j * circleR *2} 
                 }
               ) 
             )
@@ -68,9 +76,21 @@ function Test() {
         req()
 
     }, [])
+
+    useEffect(() => {
+      const ctx = textureRef.current.getContext('2d')
+      ctx.drawImage( glRenderRef.current.getTexture(), 0,0, 200,200, 0,0, 200,200 )
+    }, [])
+
     // style={{ backgroundColor: 'black' }} 
     return <div >
-    <canvas ref={cRef} width={canvasWidth} height={canvasHeight} style={{ width : canvasWidth / devicePixelRatio, height: canvasHeight/devicePixelRatio}} ></canvas>
+      <canvas ref={textureRef} width={200} height={200} style={{backgroundColor:'rgb(122,122,122,1)'}} ></canvas>
+      <canvas ref={cRef} width={canvasWidth} height={canvasHeight} 
+        style={{ 
+          width : canvasWidth / devicePixelRatio, 
+          height: canvasHeight/devicePixelRatio,
+          backgroundColor: 'rgb(122,122,122,1)'
+        }} />
     <div 
       id="fps"
       style={{
