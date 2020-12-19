@@ -1,14 +1,25 @@
+/*
+ * @Author: muyin
+ * @Date: 2020-12-19 09:44:46
+ * @email: muyin.ph@alibaba-inc.com
+ */
 export const VERTEX_SHADER = `
+    // gl窗口大小.
     uniform vec2 u_windowSize;
+
+    // 纹理大小.
+    uniform vec2 u_textureSize;
 
     attribute vec3 a_position;
     attribute vec2 a_size;
     attribute vec2 a_texCoord;
 
     varying vec2 v_texCoord;
+    varying vec2 v_size;
 
     void main() {
         
+        v_size = a_size/u_windowSize;
         vec2 position = vec2(a_position.x, a_position.y);
 
         if(a_position.z <= 1.0){
@@ -40,7 +51,12 @@ export const FRAGMENT_SHADER =`
 
     varying vec2 v_texCoord;
 
+    varying vec2 v_size;
+
+    // gl_FragCoord
+
     void main(){
+      // gl_PointCoord
         gl_FragColor = texture2D(u_image, v_texCoord);
         // gl_FragColor = vec4(v_texCoord.x *3.0,0, 0,1);
     }

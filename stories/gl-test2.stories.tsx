@@ -61,177 +61,177 @@ const fillColorArray = new Float32Array(fillColorList)
 
 
 
-export function GLTest () {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+// export function GLTest () {
+//   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  useEffect(() => {
-    const { current: canvas } = canvasRef
-    if(!canvas) return
+//   useEffect(() => {
+//     const { current: canvas } = canvasRef
+//     if(!canvas) return
 
-    const vertexShaderSource = `
-      uniform vec2 u_canvasSize;
+//     const vertexShaderSource = `
+//       uniform vec2 u_canvasSize;
       
-      attribute vec2 a_position;
-      attribute vec2 a_size;
-      attribute vec4 a_borderWidth;
-      attribute vec2 a_shapeType; // x: 1: circle; 2: rectangle; 3: angle, y: index.
+//       attribute vec2 a_position;
+//       attribute vec2 a_size;
+//       attribute vec4 a_borderWidth;
+//       attribute vec2 a_shapeType; // x: 1: circle; 2: rectangle; 3: angle, y: index.
      
-      attribute vec4 a_fillColor;
-      attribute vec4 a_borderColor;
+//       attribute vec4 a_fillColor;
+//       attribute vec4 a_borderColor;
 
-      varying vec4 v_fillColor;
-      varying vec4 v_borderColor;
-      varying vec2 v_shapeType;
-      varying vec2 v_canvasSize;
-      varying vec2 v_position;
-      varying vec2 v_size;
+//       varying vec4 v_fillColor;
+//       varying vec4 v_borderColor;
+//       varying vec2 v_shapeType;
+//       varying vec2 v_canvasSize;
+//       varying vec2 v_position;
+//       varying vec2 v_size;
 
-      void handleCircle(){
-        vec2 p = ((a_position/u_canvasSize) * 2.0 -1.0) * vec2(1, -1);
-        v_position = a_position; // 圆心坐标.
-        if(a_shape.y>0.0 && a_shape.y <= 1.0){
-          normalizeGLPosition(a_position - a_size.x * vec2(0, 2.0) );
-          return;
-        }
-        if(a_shape.y>1.0 && a_shape.y <= 2.0){
-          normalizeGLPosition(a_position + a_size.x * vec2(1, 1) );
-          return;
-        }
+//       void handleCircle(){
+//         vec2 p = ((a_position/u_canvasSize) * 2.0 -1.0) * vec2(1, -1);
+//         v_position = a_position; // 圆心坐标.
+//         if(a_shape.y>0.0 && a_shape.y <= 1.0){
+//           normalizeGLPosition(a_position - a_size.x * vec2(0, 2.0) );
+//           return;
+//         }
+//         if(a_shape.y>1.0 && a_shape.y <= 2.0){
+//           normalizeGLPosition(a_position + a_size.x * vec2(1, 1) );
+//           return;
+//         }
         
-      }
+//       }
 
-      void normalizeGLPosition(vec2 canvasPosition ) {
+//       void normalizeGLPosition(vec2 canvasPosition ) {
 
-        gl_Position = vec4( ((canvasPosition/u_canvasSize) * 2.0 -1.0) * vec2(1, -1) , 0, 1);
+//         gl_Position = vec4( ((canvasPosition/u_canvasSize) * 2.0 -1.0) * vec2(1, -1) , 0, 1);
 
-      }
+//       }
 
-      void main(){
+//       void main(){
 
-        v_fillColor = a_fillColor;
-        v_borderColor = a_borderColor;
-        v_shapeType = a_shapeType;
-        v_canvasSize = u_canvasSize;
-        v_size = a_size;
+//         v_fillColor = a_fillColor;
+//         v_borderColor = a_borderColor;
+//         v_shapeType = a_shapeType;
+//         v_canvasSize = u_canvasSize;
+//         v_size = a_size;
 
-        if( a_shapeType.x > 0.0&& a_shapeType.x <= 1.0 ){
-          handleCircle()
-        }
+//         if( a_shapeType.x > 0.0&& a_shapeType.x <= 1.0 ){
+//           handleCircle()
+//         }
 
         
 
-        // gl_Position = vec4( ((a_position/u_canvasSize) * 2.0 -1.0) * vec2(1, -1) , 0, 1);
+//         // gl_Position = vec4( ((a_position/u_canvasSize) * 2.0 -1.0) * vec2(1, -1) , 0, 1);
 
-      }
-    `
-    const fragmentShaderSource = `
-      precision highp float;
+//       }
+//     `
+//     const fragmentShaderSource = `
+//       precision highp float;
 
-      varying vec4 v_fillColor;
-      varying vec4 v_borderColor;
-      varying vec2 v_shapeType;
-      varying vec2 v_canvasSize;
-      varying vec2 v_position;
-      varying vec2 v_size;
+//       varying vec4 v_fillColor;
+//       varying vec4 v_borderColor;
+//       varying vec2 v_shapeType;
+//       varying vec2 v_canvasSize;
+//       varying vec2 v_position;
+//       varying vec2 v_size;
 
-      void drawCircle() {
-        // vec2 fragCoord = gl_FragCoord +  vec2(0, -v_canvasSize.y )
-        // const dist = distance( fragCoord,  )
-        gl_FragColor = vec4( 1,0,0,1 );
-      }
+//       void drawCircle() {
+//         // vec2 fragCoord = gl_FragCoord +  vec2(0, -v_canvasSize.y )
+//         // const dist = distance( fragCoord,  )
+//         gl_FragColor = vec4( 1,0,0,1 );
+//       }
 
-      void main(){
+//       void main(){
 
-        if( v_shapeType.x > 0.0 && v_shapeType.x<= 1.0){
-          drawCircle();
-          return;
-        }
-      }
+//         if( v_shapeType.x > 0.0 && v_shapeType.x<= 1.0){
+//           drawCircle();
+//           return;
+//         }
+//       }
 
-    `
-    function compileShader(
-      gl: WebGLRenderingContext, 
-      program: WebGLProgram,
-      source: string, 
-      type: SHADER_TYPE
-    ): WebGLShader {
-      const map: SHADER_TYPE_MAP= {
-        [SHADER_TYPE.VERTEX_SHADER]: gl.VERTEX_SHADER,
-        [SHADER_TYPE.FRAGMENT_SHADER]: gl.FRAGMENT_SHADER,
-      }
-      const shader = gl.createShader(map[type])
-      gl.shaderSource(shader, source)
-      gl.compileShader(shader)
-      console.log('compile shader success:', gl.getShaderParameter(shader, gl.COMPILE_STATUS) )
-      console.log('compile log', gl.getShaderInfoLog(shader))
-      gl.attachShader(program, shader)
-      return shader
-    }
+//     `
+//     function compileShader(
+//       gl: WebGLRenderingContext, 
+//       program: WebGLProgram,
+//       source: string, 
+//       type: SHADER_TYPE
+//     ): WebGLShader {
+//       const map: SHADER_TYPE_MAP= {
+//         [SHADER_TYPE.VERTEX_SHADER]: gl.VERTEX_SHADER,
+//         [SHADER_TYPE.FRAGMENT_SHADER]: gl.FRAGMENT_SHADER,
+//       }
+//       const shader = gl.createShader(map[type])
+//       gl.shaderSource(shader, source)
+//       gl.compileShader(shader)
+//       console.log('compile shader success:', gl.getShaderParameter(shader, gl.COMPILE_STATUS) )
+//       console.log('compile log', gl.getShaderInfoLog(shader))
+//       gl.attachShader(program, shader)
+//       return shader
+//     }
 
 
-    const gl = canvas.getContext('webgl', { alpha: true })
-    const program = gl.createProgram()
+//     const gl = canvas.getContext('webgl', { alpha: true })
+//     const program = gl.createProgram()
     
 
-    compileShader(gl, program, vertexShaderSource, SHADER_TYPE.VERTEX_SHADER)
-    compileShader(gl,program, fragmentShaderSource, SHADER_TYPE.FRAGMENT_SHADER)
-    gl.linkProgram(program)
-    gl.useProgram(program)
-    console.log('link programe:', gl.getProgramParameter(program, gl.LINK_STATUS))
+//     compileShader(gl, program, vertexShaderSource, SHADER_TYPE.VERTEX_SHADER)
+//     compileShader(gl,program, fragmentShaderSource, SHADER_TYPE.FRAGMENT_SHADER)
+//     gl.linkProgram(program)
+//     gl.useProgram(program)
+//     console.log('link programe:', gl.getProgramParameter(program, gl.LINK_STATUS))
 
-    gl.viewport(0,0, CANVAS_WIDTH, CANVAS_HEIGHT)
+//     gl.viewport(0,0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
-    const u_canvasSizeLoc =   gl.getUniformLocation(program,'u_canvasSize')
-    gl.uniform2f( u_canvasSizeLoc, CANVAS_WIDTH, CANVAS_HEIGHT )
+//     const u_canvasSizeLoc =   gl.getUniformLocation(program,'u_canvasSize')
+//     gl.uniform2f( u_canvasSizeLoc, CANVAS_WIDTH, CANVAS_HEIGHT )
 
-    const vertexShaderAttributes = {
-      a_shapeType: gl.getAttribLocation(program, 'a_shapeType'),
-      a_position: gl.getAttribLocation(program, 'a_position'),
-      a_size: gl.getAttribLocation(program, 'a_size'),
-      a_borderWidth: gl.getAttribLocation(program, 'a_borderWidth'),
-      a_fillColor: gl.getAttribLocation(program, 'a_fillColor'),
-      a_borderColor: gl.getAttribLocation(program, 'a_borderColor')
-    }
-    gl.enable(gl.BLEND)
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-
-
-    const positionBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-    gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW )
-    gl.enableVertexAttribArray(vertexShaderAttributes.a_position)
-    gl.vertexAttribPointer(vertexShaderAttributes.a_position, 2, gl.FLOAT, false, 0, 0 )
-
-    const fillColorBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, fillColorBuffer)
-    gl.bufferData(gl.ARRAY_BUFFER,fillColorArray, gl.STATIC_DRAW)
-    gl.enableVertexAttribArray(vertexShaderAttributes.a_fillColor)
-    gl.vertexAttribPointer(vertexShaderAttributes.a_fillColor, 4, gl.FLOAT, false, 0, 0)
+//     const vertexShaderAttributes = {
+//       a_shapeType: gl.getAttribLocation(program, 'a_shapeType'),
+//       a_position: gl.getAttribLocation(program, 'a_position'),
+//       a_size: gl.getAttribLocation(program, 'a_size'),
+//       a_borderWidth: gl.getAttribLocation(program, 'a_borderWidth'),
+//       a_fillColor: gl.getAttribLocation(program, 'a_fillColor'),
+//       a_borderColor: gl.getAttribLocation(program, 'a_borderColor')
+//     }
+//     gl.enable(gl.BLEND)
+//     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
 
-    const shapeTypeBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, shapeTypeBuffer)
-    gl.bufferData(gl.ARRAY_BUFFER, shapArray, gl.STATIC_DRAW)
-    gl.enableVertexAttribArray(vertexShaderAttributes.a_shapeType)
-    gl.vertexAttribPointer( vertexShaderAttributes.a_shapeType, 2, gl.FLOAT, false, 0, 0 )
+//     const positionBuffer = gl.createBuffer()
+//     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+//     gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW )
+//     gl.enableVertexAttribArray(vertexShaderAttributes.a_position)
+//     gl.vertexAttribPointer(vertexShaderAttributes.a_position, 2, gl.FLOAT, false, 0, 0 )
+
+//     const fillColorBuffer = gl.createBuffer()
+//     gl.bindBuffer(gl.ARRAY_BUFFER, fillColorBuffer)
+//     gl.bufferData(gl.ARRAY_BUFFER,fillColorArray, gl.STATIC_DRAW)
+//     gl.enableVertexAttribArray(vertexShaderAttributes.a_fillColor)
+//     gl.vertexAttribPointer(vertexShaderAttributes.a_fillColor, 4, gl.FLOAT, false, 0, 0)
 
 
-    gl.drawArrays(gl.TRIANGLES, 0, positionArray.length * 0.5)
+//     const shapeTypeBuffer = gl.createBuffer()
+//     gl.bindBuffer(gl.ARRAY_BUFFER, shapeTypeBuffer)
+//     gl.bufferData(gl.ARRAY_BUFFER, shapArray, gl.STATIC_DRAW)
+//     gl.enableVertexAttribArray(vertexShaderAttributes.a_shapeType)
+//     gl.vertexAttribPointer( vertexShaderAttributes.a_shapeType, 2, gl.FLOAT, false, 0, 0 )
 
-  }, [])
 
-  return <div>
-    <canvas 
-      ref={canvasRef} 
-      width={CANVAS_WIDTH} 
-      height={CANVAS_HEIGHT} 
-      style={{ 
-        width: CANVAS_WIDTH/ devicePixelRatio,
-        height: CANVAS_HEIGHT/ devicePixelRatio,  
-      }}
-    />
-  </div>
-}
+//     gl.drawArrays(gl.TRIANGLES, 0, positionArray.length * 0.5)
+
+//   }, [])
+
+//   return <div>
+//     <canvas 
+//       ref={canvasRef} 
+//       width={CANVAS_WIDTH} 
+//       height={CANVAS_HEIGHT} 
+//       style={{ 
+//         width: CANVAS_WIDTH/ devicePixelRatio,
+//         height: CANVAS_HEIGHT/ devicePixelRatio,  
+//       }}
+//     />
+//   </div>
+// }
 
 export default {
   title: 'GL TEST',

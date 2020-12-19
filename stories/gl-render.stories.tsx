@@ -17,19 +17,33 @@ function Test() {
         circle.height = 100
         const ctx = circle.getContext('2d')
         ctx.fillStyle= "red"
-        ctx.strokeStyle = 'red'
         ctx.arc(50,50,50,0,  Math.PI *2)
         ctx.fill()
-        ctx.stroke()
+
         
         const [circleImgId] = glRender.loadImgs([circle])
+
+        ctx.clearRect(0,0, 100, 100)
+        ctx.fillStyle= "green"
+        ctx.arc(50,50,50,0,  Math.PI)
+        ctx.fill()
+
+        const [halfImgId] = glRender.loadImgs([circle])
         
-        const xCount = 200
-        const yCount = 500
+        const xCount = 20
+        const yCount = 50
         const imgList:GlImage[] = []
         for(let i =0; i< xCount; i++){
           for( let j =0; j< yCount; j++ ){
-            imgList.push ( glRender.createElement(GL_ELEMENT_TYPES.GL_IMAGE, { imgId: circleImgId, position: {x: i *150 + 5 , y: j * 150 +5} }) )
+            imgList.push ( 
+              glRender.createElement(
+                GL_ELEMENT_TYPES.GL_IMAGE, 
+                { 
+                  imgId: imgList.length%2? circleImgId : halfImgId, 
+                  position: {x: i *150 + 5 , y: j * 150 +5} 
+                }
+              ) 
+            )
           }
         }
 
