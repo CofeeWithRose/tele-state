@@ -28,7 +28,8 @@ export declare class GLRender {
     private attrBuffer;
     private needSort;
     private positionChanged;
-    private textureChanged;
+    private imageIdChanged;
+    private textureChange;
     private rafing;
     private texture;
     constructor(glCanvas: HTMLCanvasElement, options?: {
@@ -37,6 +38,7 @@ export declare class GLRender {
     });
     getTexture: () => HTMLCanvasElement;
     private updateImidiatly;
+    private checkReloadTexure;
     private initTexture;
     private initBuffer;
     setViewPort(): void;
@@ -45,4 +47,6 @@ export declare class GLRender {
     destoryElement(ele: GLElement): void;
     loadImgs(imgs: HTMLCanvasElement[]): number[];
     private update;
+    private updateSort;
+    private updateImage;
 }

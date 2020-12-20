@@ -1,4 +1,4 @@
-import { GlImage } from './GLElement/GLImage'
+import { GlImage, UpdateHandle } from './GLElement/GLImage'
 import { FRAGMENT_SHADER, VERTEX_SHADER } from './shader';
 import { compileShader, SHADER_TYPE } from './util';
 import { Vec2 } from './Data/Vec2'
@@ -31,7 +31,7 @@ export interface GLElementParams{
 
 export class GLRender {
 
-    private  textureCanvas = new  TextureCanvasManager();
+    private  textureCanvas: TextureCanvasManager;
   
     private elemetList: GLElement[] = []
 
@@ -68,13 +68,16 @@ export class GLRender {
 
     private positionChanged = false
 
-    private textureChanged = false
+    private imageIdChanged = false
+
+    private textureChange = true
 
     private rafing = false
 
     private texture: WebGLTexture
 
-    constructor( glCanvas: HTMLCanvasElement, private options = { maxNumber:100000, textureSize: 2048 }  ){
+    constructor( glCanvas: HTMLCanvasElement, private options = { maxNumber: 50000, textureSize: 2048 }  ){
+        this.textureCanvas =  new  TextureCanvasManager( options.textureSize )
         this.gl = glCanvas.getContext('webgl', { alpha: true })
         const program = this.gl.createProgram()
         compileShader(this.gl, program, VERTEX_SHADER,SHADER_TYPE.VERTEX_SHADER )
@@ -96,7 +99,9 @@ export class GLRender {
         this.initBuffer()
         this.initTexture()
         this.setViewPort()
+       
     }
+
 
     getTexture = () => {
         return this.textureCanvas.canvas
@@ -106,7 +111,7 @@ export class GLRender {
 
         if(this.needSort){
             this.positionChanged = true
-            this.textureChanged = true
+            this.imageIdChanged = true
             this.elemetList.sort(( {zIndex: z1}, {zIndex: z2} ) =>  z1 -z2 )
             this.attrData.a_position.fill(0)
             this.attrData.a_size.fill(0)
@@ -116,7 +121,7 @@ export class GLRender {
         
         this.elemetList.forEach(({ position, imgId }, index) => {
 
-            if(this.positionChanged){
+            if(this.positionChanged === true){
                 const startIndex = index * 3 *3
                 this.attrData.a_position[startIndex] = position.x
                 this.attrData.a_position[startIndex + 1] = position.y
@@ -131,7 +136,7 @@ export class GLRender {
                 this.attrData.a_position[startIndex + 8] = 3
             }
 
-            if(this.textureChanged){
+            if(this.imageIdChanged === true){
 
                 const startIndex = index * 3*2
 
@@ -158,34 +163,43 @@ export class GLRender {
 
         })
         
-        if(this.positionChanged){
+        if(this.positionChanged === true){
             this.gl.bindBuffer( this.gl.ARRAY_BUFFER, this.attrBuffer.a_position )
             this.gl.bufferData(this.gl.ARRAY_BUFFER, this.attrData.a_position, this.gl.STATIC_DRAW)
+            this.positionChanged = false
+            console.log('positionChanged....')
         }
 
-        if(this.textureChanged) {
+        if(this.imageIdChanged ) {
 
             this.gl.bindBuffer( this.gl.ARRAY_BUFFER, this.attrBuffer.a_texCoord )
             this.gl.bufferData(this.gl.ARRAY_BUFFER, this.attrData.a_texCoord, this.gl.STATIC_DRAW)
 
             this.gl.bindBuffer( this.gl.ARRAY_BUFFER, this.attrBuffer.a_size )
             this.gl.bufferData(this.gl.ARRAY_BUFFER, this.attrData.a_size, this.gl.STATIC_DRAW)
-
-            this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture)
-            this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.textureCanvas.canvas)
+            this.imageIdChanged = false
+            // console.log('imageIdChanged...')
         }
 
-        this.positionChanged = false
-        this.textureChanged = false
+        this.checkReloadTexure()
+
+        
         this.needSort = false
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.attrData.a_position.length/3)
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.elemetList.length *3)
+    }
+
+    private checkReloadTexure = () => {
+        if(!this.textureChange) return
+        this.textureChange = false
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture)
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.textureCanvas.canvas)
+        console.log('textureChange。。')
     }
 
     private initTexture() {
         this.gl.uniform2f(this.uniformLocations.u_textureSize, this.options.textureSize, this.options.textureSize)
         this.texture = this.gl.createTexture()
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture)
-        // this.gl.texParameteri(this.gl.texImage2D,)
         this.gl.texParameterf(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
         this.gl.texParameterf(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
         this.gl.texParameterf(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
@@ -232,7 +246,12 @@ export class GLRender {
     }
   
     createElement<T extends GL_ELEMENT_TYPES>( type: T, params: GLElementParams[T] ): GLElements[T] {
-        const img =  new this.GLElemetMap[type](this.updatePosition, params)
+        const handle: UpdateHandle = { 
+            updatePosition: this.updatePosition,
+            updatezIndex: this.updateSort,
+            updateImg: this.updateImage,
+        }
+        const img =  new this.GLElemetMap[type](handle, params)
         this.elemetList.push(img)
         this.needSort = true
         this.update()
@@ -252,16 +271,27 @@ export class GLRender {
 
     loadImgs( imgs: HTMLCanvasElement[] ): number[] {
       const ids = this.textureCanvas.setImages(imgs)
+      this.textureChange = true
       return ids
     }
   
     private update = () => {
-        if(this.rafing) return 
+        if(this.rafing === true) return 
         this.rafing = true
         requestAnimationFrame( () => {
             this.updateImidiatly()
             this.rafing = false
         } )
+    }
+
+    private updateSort = () => {
+        this.needSort = true
+        this.update()
+    }
+
+    private updateImage = () => {
+        this.imageIdChanged = true
+        this.update()
     }
   
   }

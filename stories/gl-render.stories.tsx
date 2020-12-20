@@ -9,6 +9,8 @@ const canvasHeight = 969
 
 const circleR = 10
 
+const borderR = 0
+
 function Test() {
     const cRef = useRef()
 
@@ -20,10 +22,11 @@ function Test() {
         const glRender = new GLRender(cRef.current)
         glRenderRef.current = glRender
         const circle = document.createElement('canvas')
-        circle.width = circleR *2
-        circle.height = circleR *2
+        circle.width = (circleR+ borderR) *2
+        circle.height = (circleR+ borderR)  *2
         const ctx = circle.getContext('2d')
-        ctx.fillStyle= "black"
+        ctx.fillStyle= "rgba(50,255,255,0.5)"
+        ctx.lineWidth= borderR
         ctx.arc(circleR, circleR, circleR,0,  Math.PI *2)
         ctx.fill()
 
@@ -31,26 +34,26 @@ function Test() {
         const [circleImgId] = glRender.loadImgs([circle])
 
         ctx.clearRect(0,0, circleR *2, circleR *2)
-        ctx.fillStyle= "#a0a0a0"
-        ctx.arc(circleR, circleR, circleR, 0,  Math.PI *2 )
+        ctx.fillStyle= "rgba(255,125,125,0.5)"
+        ctx.arc(circleR, circleR , circleR, 0,  Math.PI *2 )
         ctx.fill()
 
         const [halfImgId] = glRender.loadImgs([circle])
-        
-        const xCount = 200
-        const yCount = 50
-        
+        let reqH = {};
+        const xCount = 250
+        const yCount = 200
         const imgList:GlImage[] = []
         for(let i =0; i< xCount; i++){
           for( let j =0; j< yCount; j++ ){
             imgList.push ( 
+        
               glRender.createElement(
                 GL_ELEMENT_TYPES.GL_IMAGE, 
                 { 
-                  imgId: imgList.length%3? circleImgId : halfImgId, 
-                  position: {x: i *circleR *2  , y: j * circleR *2} 
+                  imgId:imgList.length%2? circleImgId: halfImgId , 
+                  position:  {x: i *circleR *2  , y: j * circleR *2}
                 }
-              ) 
+              ),
             )
           }
         }
@@ -70,11 +73,19 @@ function Test() {
             lastTime = now;
           }
 
-          imgList.forEach( e => e.setPosition( e.position.x+0.1, e.position.y + 0.1 ) )
-          requestAnimationFrame(req)
+          imgList.forEach( (e, ind) => {
+            // if(!(frameCount%10)){
+              e.setPosition( Math.random() * (canvasWidth - circleR *2), Math.random() * (canvasHeight - circleR *2) )
+
+            // }
+            e.setImgId(ind%2? circleImgId: halfImgId)
+          })
+          // reqH.a =requestAnimationFrame(req)
         }
         req()
-
+        return () => { 
+          cancelAnimationFrame(reqH.a)
+        }
     }, [])
 
     useEffect(() => {
@@ -84,22 +95,23 @@ function Test() {
 
     // style={{ backgroundColor: 'black' }} 
     return <div >
-      <canvas ref={textureRef} width={200} height={200} style={{backgroundColor:'rgb(122,122,122,1)'}} ></canvas>
       <canvas ref={cRef} width={canvasWidth} height={canvasHeight} 
         style={{ 
           width : canvasWidth / devicePixelRatio, 
           height: canvasHeight/devicePixelRatio,
           backgroundColor: 'rgb(122,122,122,1)'
         }} />
-    <div 
-      id="fps"
-      style={{
-        backgroundColor:'white',
-        position: 'fixed',
-        left: 0,
-        top: 0,
-      }}
-    />
+      <canvas ref={textureRef} width={200} height={200} style={{backgroundColor:'rgb(122,122,122,1)'}} ></canvas>
+
+      <div 
+        id="fps"
+        style={{
+          backgroundColor:'white',
+          position: 'fixed',
+          left: 0,
+          top: 0,
+        }}
+      />
    </ div >
 }
 
