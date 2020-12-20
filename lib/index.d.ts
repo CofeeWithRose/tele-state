@@ -16,8 +16,11 @@ export interface GLElementParams {
         position: Vec2;
     };
 }
+declare const DEFAULT_OPTION: {
+    maxNumber: number;
+    textureSize: number;
+};
 export declare class GLRender {
-    private options;
     private textureCanvas;
     private elemetList;
     private GLElemetMap;
@@ -32,10 +35,8 @@ export declare class GLRender {
     private textureChange;
     private rafing;
     private texture;
-    constructor(glCanvas: HTMLCanvasElement, options?: {
-        maxNumber: number;
-        textureSize: number;
-    });
+    private options;
+    constructor(glCanvas: HTMLCanvasElement, options?: Partial<typeof DEFAULT_OPTION>);
     getTexture: () => HTMLCanvasElement;
     private updateImidiatly;
     private checkReloadTexure;
@@ -50,3 +51,4 @@ export declare class GLRender {
     private updateSort;
     private updateImage;
 }
+export {};

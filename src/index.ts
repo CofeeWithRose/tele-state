@@ -28,7 +28,7 @@ export interface GLElementParams{
 }
 
 
-
+const DEFAULT_OPTION = { maxNumber: 50000, textureSize: 2048 }
 export class GLRender {
 
     private  textureCanvas: TextureCanvasManager;
@@ -76,7 +76,10 @@ export class GLRender {
 
     private texture: WebGLTexture
 
-    constructor( glCanvas: HTMLCanvasElement, private options = { maxNumber: 50000, textureSize: 2048 }  ){
+    private options: typeof DEFAULT_OPTION 
+
+    constructor( glCanvas: HTMLCanvasElement,   options?: Partial<typeof DEFAULT_OPTION>   ){
+        this.options = { ...DEFAULT_OPTION,  ...options}
         this.textureCanvas =  new  TextureCanvasManager( options.textureSize )
         this.gl = glCanvas.getContext('webgl', { alpha: true })
         const program = this.gl.createProgram()
@@ -167,7 +170,7 @@ export class GLRender {
             this.gl.bindBuffer( this.gl.ARRAY_BUFFER, this.attrBuffer.a_position )
             this.gl.bufferData(this.gl.ARRAY_BUFFER, this.attrData.a_position, this.gl.STATIC_DRAW)
             this.positionChanged = false
-            console.log('positionChanged....')
+            // console.log('positionChanged....')
         }
 
         if(this.imageIdChanged ) {

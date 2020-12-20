@@ -19,7 +19,11 @@ function Test() {
     const glRenderRef  =  useRef<GLRender>()
 
     useEffect(() =>{
-        const glRender = new GLRender(cRef.current)
+
+        const xCount = 50
+        const yCount = 200
+
+        const glRender = new GLRender(cRef.current, { maxNumber: xCount * yCount })
         glRenderRef.current = glRender
         const circle = document.createElement('canvas')
         circle.width = (circleR+ borderR) *2
@@ -40,8 +44,7 @@ function Test() {
 
         const [halfImgId] = glRender.loadImgs([circle])
         let reqH = {};
-        const xCount = 250
-        const yCount = 200
+        
         const imgList:GlImage[] = []
         for(let i =0; i< xCount; i++){
           for( let j =0; j< yCount; j++ ){
@@ -61,7 +64,6 @@ function Test() {
         const fpsDiv = document.querySelector('#fps')
         let lastTime = performance.now()
         let frameCount = 0
-          
         const req = () => {
           frameCount++
           const now = performance.now()
@@ -72,15 +74,15 @@ function Test() {
             frameCount = 0;
             lastTime = now;
           }
-
           imgList.forEach( (e, ind) => {
             // if(!(frameCount%10)){
               e.setPosition( Math.random() * (canvasWidth - circleR *2), Math.random() * (canvasHeight - circleR *2) )
+              // e.setPosition( e.position.x+1, e.position.y +1 )
 
             // }
-            e.setImgId(ind%2? circleImgId: halfImgId)
+            // e.setImgId(ind%2? circleImgId: halfImgId)
           })
-          // reqH.a =requestAnimationFrame(req)
+          reqH.a =requestAnimationFrame(req)
         }
         req()
         return () => { 
