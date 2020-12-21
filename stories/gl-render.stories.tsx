@@ -7,7 +7,7 @@ import { GlImage } from '../lib/GLElement/GLImage';
 const canvasWidth = 1920
 const canvasHeight = 969
 
-const circleR = 10
+const circleR = 5
 
 const borderR = 0
 
@@ -20,8 +20,8 @@ function Test() {
 
     useEffect(() =>{
 
-        const xCount = 50
-        const yCount = 200
+        const xCount = 200
+        const yCount = 500
 
         const glRender = new GLRender(cRef.current, { maxNumber: xCount * yCount })
         glRenderRef.current = glRender
@@ -76,11 +76,12 @@ function Test() {
           }
           imgList.forEach( (e, ind) => {
             // if(!(frameCount%10)){
-              e.setPosition( Math.random() * (canvasWidth - circleR *2), Math.random() * (canvasHeight - circleR *2) )
+              // e.setPosition( Math.random() * (canvasWidth - circleR *2), Math.random() * (canvasHeight - circleR *2) )
               // e.setPosition( e.position.x+1, e.position.y +1 )
 
             // }
-            // e.setImgId(ind%2? circleImgId: halfImgId)
+            // e.setImgId((Date.now())%(2* 1000) < 1 *1000?  (ind%2? circleImgId: halfImgId) : (ind%3? circleImgId: halfImgId))
+            e.setImgId((frameCount+ind)%60? circleImgId: halfImgId)
           })
           reqH.a =requestAnimationFrame(req)
         }
